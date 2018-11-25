@@ -5,7 +5,7 @@
 
     <groupId>com.spawpaw</groupId>
     <artifactId>short-url-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>v1.0.0</version>
     <packaging>jar</packaging>
 
     <name>short-url-service</name>
