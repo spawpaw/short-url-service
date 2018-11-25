@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>短Url生成</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <style>
+        html,body, div, form {
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            min-width: 100%;
+            min-height: 100%;
+            flex-grow: 1;
+            flex-direction: column;
+        }
+
+        .form {
+
+        }
+
+        .content {
+            flex-grow: 1;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer {
+            flex-grow: 0;
+            padding: 2rem;
+            justify-content: center;
+        }
+
+        .wrapper {
+            flex-grow: 0;
+            flex-direction: column;
+        }
+
+        .forms {
+            flex-direction: column;
+        }
+
+        .tab {
+            color: black;
+            padding: 0.5rem;
+            justify-content: center;
+            width: 6rem;
+            border: 1px solid rgba(0, 0, 255, 0.4);
+            border-bottom: none;
+            margin: 0 4px -1px 0;
+
+            -webkit-transition: color 0.2s;
+            -moz-transition: color 0.2s;
+            -ms-transition: color 0.2s;
+            -o-transition: color 0.2s;
+            transition: color 0.2s;
+        }
+
+        .tab:hover {
+            color: rgba(0, 0, 255, 0.4);
+
+        }
+
+        .selected-tab {
+            border-bottom: solid white;
+        }
+
+        .line {
+        }
+
+        .function-tab {
+
+            border-bottom: solid 1px rgba(0, 0, 255, 0.4);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            padding: 1rem;
+        }
+
+        .url-input {
+            flex-grow: 1;
+            margin: 0;
+            font-size: 1.1rem;
+            padding: 8px;
+            transition: border 0.2s;
+            border: solid 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .url-input:hover {
+            border: solid 1px rgba(0, 0, 255, 0.4);
+        }
+
+        .url-submit {
+            margin: 0;
+        }
+
+        .result {
+            margin-top: 8px;
+            flex-direction: column;
+        }
+
+        .result-short-url-label {
+            margin-top: 4px;
+            font-weight: bold;
+        }
+
+        .result-short-url-content {
+            font-weight: normal;
+        }
+
+        .config-label {
+        }
+
+        .config-value {
+        }
+
+        .config-title {
+            font-weight: bold;
+        }
+
+        .config-wrapper {
+            margin-top: 16px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<div class="content">
+
+    <div class="wrapper">
+        <div class="title">短URL生成器</div>
+        <div class="function-tab">
+            <div class="tab selected-tab" id="tab-encode" onclick="switchToEncoder()">缩短网址</div>
+            <div class="tab" id="tab-decode" onclick="switchToDecoder()">网址还原</div>
+        </div>
+        <hr class="line">
+        <div class="forms">
+            <form action="/" method="post" class="form" id="url-encoder">
+                <label> <input name="action" type="text" value="create" hidden> </label>
+                <label><input name="url" type="text" class="url-input" placeholder="请输入长网址"> </label>
+                <!--如果不加协议，则默认为http-->
+                <input type="submit" value="生成短网址" class="url-submit">
+            </form>
+            <form action="/" method="post" class="form" id="url-decoder" style="display: none">
+                <label> <input name="action" type="text" value="parse" hidden> </label>
+                <label><input name="url" type="text" class="url-input" placeholder="请输入短网址"> </label>
+                <!--如果不加协议，则默认为http-->
+                <input type="submit" value="还原短网址" class="url-submit">
+            </form>
+        </div>
+        <div class="result" th:if="${shortUrl!=null}">
+            <div class="result-short-url-label">短网址：
+                <a class="result-short-url-content" th:href="${config.shortUrlHost}+'/'+${shortUrl.shortUrl}"
+                   th:text="${config.shortUrlHost}+${shortUrl.shortUrl}"></a>
+            </div>
+            <div class="result-short-url-label">原网址：
+                <span class="result-short-url-content" th:text="${shortUrl.rawUrl}"></span>
+            </div>
+        </div>
+        <div class="result" th:if="${ex!=null}">
+            <div>出现错误</div>
+            <div>错误信息：
+                <span th:text="${ex.code}" title="错误码"></span>:
+                <span th:text="${ex.message}" title="错误信息"></span>
+            </div>
+        </div>
+        <div class="result config-wrapper" th:if="${config!=null}">
+            <div class="config-title" title="当前服务器的配置信息">配置信息：</div>
+            <div>当前启用的服务：<span title="基于自增序列的短网址生成服务">AutoIncrementShortUrlService</span></div>
+            <table>
+                <thead>
+                <tr>
+                    <td>配置项</td>
+                    <td>值</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:title="checkUrlMaxLength">是否检查url长度</td>
+                    <td th:text="${config.checkUrlMaxLength}"></td>
+                </tr>
+                <tr>
+                    <td th:title="maxUrlLength">允许的最大url长度</td>
+                    <td th:text="${config.maxUrlLength}"></td>
+                </tr>
+                <tr>
+                    <td th:title="appendProtocolIfEmpty">当用户没有添加协议时自动补充</td>
+                    <td th:text="${config.appendProtocolIfEmpty}"></td>
+                </tr>
+                <tr>
+                    <td th:title="defaultProtocol">自动补充的协议</td>
+                    <td th:text="${config.defaultProtocol}"></td>
+                </tr>
+                <tr>
+                    <td th:title="checkProtocols">是否检查协议在允许列表</td>
+                    <td th:text="${config.checkProtocols}"></td>
+                </tr>
+                <tr>
+                    <td th:title="availableProtocols">允许的协议</td>
+                    <td th:text="${config.availableProtocols}"></td>
+                </tr>
+                <tr>
+                    <td th:title="checkDomain">检查域名是否在禁止列表中</td>
+                    <td th:text="${config.checkDomain}"></td>
+                </tr>
+                <tr>
+                    <td th:title="blockedDomains">域名禁止列表</td>
+                    <td th:text="${config.blockedDomains}"></td>
+                </tr>
+                <tr>
+                    <td th:title="allowIpAddress">是否允许使用IP地址作为域名</td>
+                    <td th:text="${config.allowIpAddress}"></td>
+                </tr>
+                <tr>
+                    <td th:title="checkAvailableTopLevelDomains">检查顶级域名是否在允许列表中</td>
+                    <td th:text="${config.checkAvailableTopLevelDomains}"></td>
+                </tr>
+                <tr>
+                    <td th:title="availableTopLevelDomains">允许的顶级域名</td>
+                    <td th:text="${config.availableTopLevelDomains}"></td>
+                </tr>
+                <tr>
+                    <td th:title="allowServerPort">允许用户自定义端口号</td>
+                    <td th:text="${config.allowServerPort}"></td>
+                </tr>
+                <tr>
+                    <td th:title="shortUrlHost">进行短url解析的主机</td>
+                    <td th:text="${config.shortUrlHost}"></td>
+                </tr>
+                <tr>
+                    <td th:title="checkHostFormat">检查域名格式</td>
+                    <td th:text="${config.checkHostFormat}"></td>
+                </tr>
+                <tr>
+                    <td th:title="hostFormatPattern">域名匹配正则式</td>
+                    <td th:text="${config.hostFormatPattern}"></td>
+                </tr>
+                <tr>
+                    <td th:title="icp">网站的ICP备案号</td>
+                    <td th:text="${config.icp}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="footer">
+    <a href='http://www.miibeian.gov.cn' target='_blank' class="icp" th:text="${config.icp}"></a>
+</div>
+
+<script>
+    var encoder = document.getElementById("url-encoder");
+    var decoder = document.getElementById("url-decoder");
+    var tabDecode = document.getElementById("tab-decode");
+    var tabDecode = document.getElementById("tab-encode");
+
+    function switchToEncoder() {
+        encoder.style.display = "flex";
+        decoder.style.display = "none";
+        $("#tab-encode").addClass("selected-tab");
+        $("#tab-decode").removeClass("selected-tab");
+    }
+
+    function switchToDecoder() {
+        encoder.style.display = "none";
+        decoder.style.display = "flex";
+        $("#tab-encode").removeClass("selected-tab");
+        $("#tab-decode").addClass("selected-tab");
+    }
+
+</script>
+</body>
+</html>
