@@ -15,7 +15,8 @@ customProps:
   appendProtocolIfEmpty: true
   defaultProtocol: http
 
-
+  checkUrlMaxLength: true
+  maxUrlLength: 255
   # URL检查
   # 是否检查协议在允许列表中（如开启此项，尽量将appendProtocolIfEmpty也打开）
   checkProtocols: true
