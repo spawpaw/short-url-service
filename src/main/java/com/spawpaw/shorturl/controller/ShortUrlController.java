@@ -54,11 +54,6 @@ public class ShortUrlController {
     @RequestMapping(path = "/{shortUrl}", method = RequestMethod.GET)
     public void redirect(@PathVariable(value = "shortUrl", required = true) String shortUrl, HttpServletResponse response) {
         String rawUrl = shortUrlService.decode(shortUrl).getRawUrl();
-        String s = rawUrl.toLowerCase();
-        if (s.matches("[a-zA-Z0-9]?://")) {
-            response.setHeader("Location", rawUrl);
-        } else {
-            response.setHeader("Location", "//" + rawUrl);
-        }
+        response.setHeader("Location", rawUrl);
     }
 }
