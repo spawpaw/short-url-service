@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
     <style>
-        html,body, div, form {
+        html, body, div, form {
             display: flex;
             margin: 0;
             padding: 0;
@@ -154,7 +154,7 @@
         </div>
         <div class="result" th:if="${shortUrl!=null}">
             <div class="result-short-url-label">短网址：
-                <a class="result-short-url-content" th:href="${config.shortUrlHost}+'/'+${shortUrl.shortUrl}"
+                <a class="result-short-url-content" th:href="${config.shortUrlHost}+${shortUrl.shortUrl}"
                    th:text="${config.shortUrlHost}+${shortUrl.shortUrl}"></a>
             </div>
             <div class="result-short-url-label">原网址：
