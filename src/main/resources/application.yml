@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 23391
 debug: true
 spring:
   datasource:
@@ -48,7 +48,7 @@ customProps:
 
   ##################################################################################################### 其他自定义配置
   # 用于解析短域名的url
-#  shortUrlHost: http://s.neko.chat/
-  shortUrlHost: http://localhost:8080/
+  shortUrlHost: http://s.neko.chat/
+#  shortUrlHost: http://localhost:8080/
   #网站的icp备案号
   icp: 苏ICP备17002505号-2

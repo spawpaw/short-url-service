@@ -63,9 +63,14 @@ public class Config {
     public List<String> availableTopLevelDomains;
 
 
+    /**
+     * 当用户输入的网址没有匹配的协议时自动添加的协议
+     */
     @Value("${customProps.appendProtocolIfEmpty}")
     public Boolean appendProtocolIfEmpty;
-
+    /**
+     * 是否检查url中的协议在允许列表中
+     */
     @Value("${customProps.checkProtocols}")
     public Boolean checkProtocols;
 
@@ -76,6 +81,7 @@ public class Config {
     /**
      * 开始编码的url长度，
      */
+    @Value("${customProps.preferStartLength}")
     public Integer preferStartLength;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////other config
